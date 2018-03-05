@@ -1,7 +1,7 @@
 package org.student.unit.task.service.health.impl;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import org.student.unit.task.service.health.HealthCheckService;
 public class HealthCheckServiceImpl implements HealthCheckService
 {
     @Autowired
-    private List<HealthCheckOperation> healthCheckOperations;
+    private List<HealthCheckOperation> operations;
 
     @Value("${info.app.version}")
     private String applicationVersion;
@@ -25,9 +25,11 @@ public class HealthCheckServiceImpl implements HealthCheckService
     public HealthCheckResponse checkSystemsAvailability()
     {
         HealthCheckResponse response = new HealthCheckResponse();
-        List<SystemStatus> systemStatusList = healthCheckOperations.stream()
-                .map(HealthCheckOperation::doHealthCheck)
-                .collect(Collectors.toList());
+        List<SystemStatus> systemStatusList = new ArrayList<>();
+        for (HealthCheckOperation operation : operations) {
+            SystemStatus doHealthCheck = operation.doHealthCheck();
+            systemStatusList.add(doHealthCheck);
+        }
         response.setSystemStatus(systemStatusList);
         response.setVersion(applicationVersion);
         response.setOverAllStatus(getOverAllAvailabilityStatus(systemStatusList));
@@ -35,19 +37,15 @@ public class HealthCheckServiceImpl implements HealthCheckService
         return response;
     }
 
-    private String getOverAllAvailabilityStatus(List<SystemStatus> systemStatusList)
-    {
+    private String getOverAllAvailabilityStatus(List<SystemStatus> systemStatusList) {
         return isOverAllSystemsAvailable(systemStatusList) ?
                 HealthStatus.HEALTHY.getStatus() :
                 HealthStatus.UNHEALTHY.getStatus();
     }
 
-    private boolean isOverAllSystemsAvailable(List<SystemStatus> systemStatusList)
-    {
-        for (SystemStatus systemStatus : systemStatusList)
-        {
-            if (systemStatus.isAvailable() == null || Boolean.FALSE.equals(systemStatus.isAvailable()))
-            {
+    private boolean isOverAllSystemsAvailable(List<SystemStatus> systemStatusList) {
+        for (SystemStatus systemStatus : systemStatusList) {
+            if (systemStatus.isAvailable() == null || Boolean.FALSE.equals(systemStatus.isAvailable())) {
                 return false;
             }
         }

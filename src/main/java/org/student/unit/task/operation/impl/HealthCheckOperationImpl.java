@@ -8,8 +8,7 @@ import org.student.unit.task.operation.HealthCheckOperation;
 public class HealthCheckOperationImpl implements HealthCheckOperation
 {
     @Override
-    public SystemStatus doHealthCheck()
-    {
+    public SystemStatus doHealthCheck() {
         SystemStatus status = new SystemStatus("FAKE");
         status.setAvailable(true);
 

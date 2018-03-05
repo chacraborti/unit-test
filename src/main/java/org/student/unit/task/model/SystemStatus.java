@@ -1,7 +1,6 @@
 package org.student.unit.task.model;
 
-public class SystemStatus
-{
+public class SystemStatus {
     private String sourceSystem;
 
     private Boolean available;
@@ -21,13 +20,11 @@ public class SystemStatus
         this.sourceSystem = sourceSystem;
     }
 
-    public Boolean isAvailable()
-    {
+    public Boolean isAvailable() {
         return available;
     }
 
-    public void setAvailable(Boolean available)
-    {
+    public void setAvailable(Boolean available) {
         this.available = available;
     }
 }
