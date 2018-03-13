@@ -23,8 +23,7 @@ public class HealthCheckController
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<HealthCheckResponse> checkSystemStatus()
-    {
+    public ResponseEntity<HealthCheckResponse> checkSystemStatus() {
         HealthCheckResponse response = healthCheckService.checkSystemsAvailability();
         if (HealthStatus.UNHEALTHY.getStatus().equals(response.getOverAllStatus()))
         {
