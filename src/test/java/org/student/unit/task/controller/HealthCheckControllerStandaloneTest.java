@@ -31,8 +31,8 @@ public class HealthCheckControllerStandaloneTest {
     private MockMvc mockMvc;
     @Mock
     private HealthCheckService service;
-    @Mock
-    private HealthCheckResponse response;
+
+    private HealthCheckResponse response = new HealthCheckResponse();
     @InjectMocks
     private HealthCheckController controller;
 

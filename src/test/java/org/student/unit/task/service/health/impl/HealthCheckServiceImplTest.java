@@ -3,6 +3,7 @@ package org.student.unit.task.service.health.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.matchers.Null;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.student.unit.task.model.HealthCheckResponse;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +61,7 @@ public class HealthCheckServiceImplTest {
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(1));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(true));
         assertThat(response.getOverAllStatus(), is(HealthStatus.HEALTHY.getStatus()));
     }
 
@@ -71,6 +74,7 @@ public class HealthCheckServiceImplTest {
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(1));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(Null.NULL));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
@@ -83,124 +87,171 @@ public class HealthCheckServiceImplTest {
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(1));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(false));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesTrueAndFalse() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(true, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(false, secondOperation);
-
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(true);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(false);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
 
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(true));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(false));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
-    }
-
-    private SystemStatus addValueWithSystemStatus(Boolean available, HealthCheckOperation operation) {
-        SystemStatus fistStatus = new SystemStatus("");
-        fistStatus.setAvailable(available);
-        value.add(operation);
-        return fistStatus;
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesTrueAndNull() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(true, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(null, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(true);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(null);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
 
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(true));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(Null.NULL));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesTrueAndTrue() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(true, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(true, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(true);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(true);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(true));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(true));
         assertThat(response.getOverAllStatus(), is(HealthStatus.HEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesFalseAndFalse() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(false, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(false, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(false);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(false);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(false));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(false));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesFalseAndNull() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(false, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(null, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(false);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(null);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(false));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(Null.NULL));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesFalseAndTrue() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(false, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(true, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(false);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(true);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(false));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(true));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesNullAndFalse() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(null, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(false, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(null);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(false);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(Null.NULL));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(false));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesNullAndNull() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(null, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(null, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(null);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(null);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(Null.NULL));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(Null.NULL));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 
     @Test
     public void checkSystemsAvailabilityWithOperationAndTwoStatusesNullAndTrue() throws Exception {
-        SystemStatus fistStatus = addValueWithSystemStatus(null, firstOperation);
-        SystemStatus secondStatus = addValueWithSystemStatus(true, secondOperation);
+        SystemStatus fistStatus = new SystemStatus("");
+        fistStatus.setAvailable(null);
+        SystemStatus secondStatus = new SystemStatus("");
+        secondStatus.setAvailable(true);
+        value.add(firstOperation);
+        value.add(secondOperation);
         when(firstOperation.doHealthCheck()).thenReturn(fistStatus);
         when(secondOperation.doHealthCheck()).thenReturn(secondStatus);
         response = healthCheckService.checkSystemsAvailability();
         assertThat(response.getVersion(), is(VERSION));
         assertThat(response.getSystemStatus(), hasSize(2));
+        assertThat(response.getSystemStatus().get(0).isAvailable(), is(Null.NULL));
+        assertThat(response.getSystemStatus().get(1).isAvailable(), is(true));
         assertThat(response.getOverAllStatus(), is(HealthStatus.UNHEALTHY.getStatus()));
     }
 }
