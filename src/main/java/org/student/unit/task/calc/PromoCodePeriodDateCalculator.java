@@ -68,10 +68,6 @@ public class PromoCodePeriodDateCalculator {
     private LocalDate resolveRefreshDateOnQuarterlyRule(LocalDate refreshDate) {
         int month = refreshDate.getMonthOfYear();
 
-        if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("Incorrect month of year");
-        }
-
         if (month < 4) {
             return refreshDate.withMonthOfYear(4).withDayOfMonth(1);
         } else if (month < 7) {

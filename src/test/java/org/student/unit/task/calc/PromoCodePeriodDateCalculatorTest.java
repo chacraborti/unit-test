@@ -5,11 +5,13 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.student.unit.task.model.BenefitPeriod;
 import org.student.unit.task.operation.impl.HealthCheckOperationImpl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.isNotNull;
@@ -208,5 +210,69 @@ public class PromoCodePeriodDateCalculatorTest {
         assertThat(date, is(new LocalDate("2019-01-01")));
     }
 
+    @Test
+    public void getLastDateTimeOfPeriodBiYearLessThan7() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime("2018-06-15").getMillis());
+        LocalDateTime dateTime = periodDateCalculator.getLastDateTimeOfPeriod(BenefitPeriod.BIYEAR, DateTimeZone.UTC);
+        assertThat(dateTime, is(new LocalDate("2018-06-30").toDateTimeAtStartOfDay().millisOfDay()
+                .withMaximumValue().withZoneRetainFields(DateTimeZone.UTC).withZone(DateTimeZone.UTC).toLocalDateTime()));
+    }
 
+
+    @Test
+    public void getLastDateTimeOfPeriodBiYear() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime("2018-12-15").getMillis());
+        LocalDateTime dateTime = periodDateCalculator.getLastDateTimeOfPeriod(BenefitPeriod.BIYEAR, DateTimeZone.UTC);
+        assertThat(dateTime, is(new LocalDate("2018-12-31").toDateTimeAtStartOfDay().millisOfDay()
+                .withMaximumValue().withZoneRetainFields(DateTimeZone.UTC).withZone(DateTimeZone.UTC).toLocalDateTime()));
+    }
+
+    @Test
+    public void getLastDateOfPeriodBiYear() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime("2018-12-15").getMillis());
+        LocalDate date = periodDateCalculator.getLastDateOfPeriod(BenefitPeriod.BIYEAR, DateTimeZone.UTC);
+        assertThat(date, is(new LocalDate("2018-12-31")));
+    }
+
+    @Test
+    public void getRefreshDateBiYear() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime("2018-12-15").getMillis());
+        LocalDate date = periodDateCalculator.getRefreshDate(BenefitPeriod.BIYEAR, DateTimeZone.UTC);
+        assertThat(date, is(new LocalDate("2019-01-01")));
+    }
+
+    @Test
+    public void getLastDateTimeOfPeriodThrowException() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime("2018-12-15").getMillis());
+        try{
+            periodDateCalculator.getLastDateTimeOfPeriod(BenefitPeriod.ANOTHER, DateTimeZone.UTC);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e , instanceOf(IllegalArgumentException.class));
+            assertThat(e.getMessage() , is("Incorrect benefit period"));
+        }
+    }
+
+    @Test
+    public void getLastDateOfPerioThrowException() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime("2018-12-15").getMillis());
+        try{
+            periodDateCalculator.getLastDateOfPeriod(BenefitPeriod.ANOTHER, DateTimeZone.UTC);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e , instanceOf(IllegalArgumentException.class));
+            assertThat(e.getMessage() , is("Incorrect benefit period"));
+        }
+    }
+
+    @Test
+    public void getRefreshDateThrowException() throws Exception {
+        try{
+            periodDateCalculator.getRefreshDate(BenefitPeriod.ANOTHER, DateTimeZone.UTC);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e , instanceOf(IllegalArgumentException.class));
+            assertThat(e.getMessage() , is("Incorrect benefit period"));
+        }
+    }
 }

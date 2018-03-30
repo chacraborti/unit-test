@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public enum BenefitPeriod
 {
-    MONTH("MONTHLY"), QUARTER("QUARTERLY"), YEAR("YEARLY"), BIYEAR("BI-YEARLY");
+    MONTH("MONTHLY"), QUARTER("QUARTERLY"), YEAR("YEARLY"), BIYEAR("BI-YEARLY"), ANOTHER("Another");
 
     private String value;
 
